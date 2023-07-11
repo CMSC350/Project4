@@ -1,13 +1,3 @@
-/*
- * Name: Corey Glover
- * Date: July10, 2023
- * Course: CMSC 350
- * Description: Class DirectedGraph that will take the input and separate the values
- * into individual vertices then prints them depending on their dependents
- * Source: Similar code from textbook provided by UMGS course, Youtube: https://www.youtube.com/watch?v=wMq9c_sKnyE
- * Youtube: https://www.youtube.com/watch?v=wJSTWTu4RHU, https://www.youtube.com/watch?v=q6xXq6Doj00 and 
- * https://www.youtube.com/watch?v=j5flXM4CmM4&list=PLLhXOOcUg89CBvj7ntb8DWFCkTVKrn-U1&index=18
- */
 import java.io.*;
 import java.util.*;
 
@@ -54,22 +44,22 @@ public class DirectedGraph {
 
     public static Vertex find(Vertex current, String name) {
         if (current == null) {
-            return null; // Vertex not found
+            return null; // not found
         }
 
         if (current.name.equals(name)) {
             current.found = true;
-            return current; // Vertex found
+            return current; // found
         }
 
-        return find(current.next, name); // Recursively search for the vertex
+        return find(current.next, name); // search for the vertex
     }
 
     public static Vertex findAddVertex(String name) {
         Vertex vertex = find(head, name);
 
         if (vertex != null) {
-            return vertex; // Vertex found
+            return vertex; // found
         }
 
         vertex = new Vertex(name);
@@ -81,10 +71,11 @@ public class DirectedGraph {
         }
         tail = vertex;
 
-        return vertex; // New vertex added
+        return vertex; // New vertex
     }
 
     static void print() {
+    	System.out.print("Standard View: \n");
         Vertex curVer = head;
         while (curVer != null) {
             System.out.print("Vertex: " + curVer.name + " Edges: ");
@@ -97,8 +88,23 @@ public class DirectedGraph {
             
             curVer = curVer.next;
         }
+        System.out.print("------------------------");
     }
-
+    static void hierarchyPrint() {
+    	System.out.print("\nHierarchy View: \n");
+        Vertex curVer = head;
+        while (curVer != null) {
+            System.out.print(curVer.name);
+            Edge curEdge = curVer.firstEdge;
+            while (curEdge != null) {
+                System.out.print("\n   " + curEdge.vertex.name);
+                curEdge = curEdge.next;
+            }
+            System.out.println();            
+            curVer = curVer.next;
+        }
+        System.out.print("----------------------");
+    }
     public static void removeVertex() {
         Vertex curVer = head;
         Vertex lastVer = null;
@@ -123,12 +129,10 @@ public class DirectedGraph {
                     // Remove the current vertex
                 	lastVer.next = curVer.next;
                 }
-
                 // Update the tail if the current vertex is the tail
                 if (curVer == tail) {
                     tail = lastVer;
                 }
-
                 // Move to the next vertex
                 curVer = curVer.next;
             } else {
@@ -139,16 +143,18 @@ public class DirectedGraph {
         }
     }
 
-    public static void notReached() {
+    public static boolean notReached() {
         Vertex curVer = head;
         depthFirst(curVer);
         while (curVer != null) {
             if (!curVer.found) {
                 System.out.print("\n-----------------------\n");
                 System.out.println(curVer.name + " is unreachable");
+                return true;
             }
             curVer = curVer.next;
         }
+		return false;
         
     }
     
@@ -163,17 +169,13 @@ public class DirectedGraph {
          }
 
          start.found = true;
-//         actions.processVertex(start);
 
          Edge newEdge = start.firstEdge;
          while (newEdge != null) {
              Vertex nextEdge = newEdge.vertex;
              if (!nextEdge.found) {
-//                 actions.descend();
                  depthFirst(nextEdge);
-//                 actions.ascend();
              } else if (!nextEdge.complete) {
-//                 actions.cycleDetected(nextCase);
             	 System.out.println("-----------------------");
             	 cycleDetected(nextEdge);
              }
@@ -216,6 +218,7 @@ public class DirectedGraph {
 
         // Printing the updated graph
         DirectedGraph.print();
+        DirectedGraph.hierarchyPrint();
 
         // Display unreachable classes
         notReached();
@@ -226,3 +229,4 @@ public class DirectedGraph {
         buildGraph();
     }
 }
+
